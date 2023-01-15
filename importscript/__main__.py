@@ -10,13 +10,6 @@ from tkinter.filedialog import askdirectory
 # except:
 #     print("Something went wrong when loading the file. Talk to Newton")
 
-cred = {
-'un': 'newton145', 
-'pw' : 'bvq8fvp2rza2RYQ@pep', 
-'url' : 'https://log.concept2.com/login',
-'dev_url': 'https://log-dev.concept2.com/login'
-}
-
 
 form_data = {'username':'newton145', 'pw':'bvq8fvp2rza2RYQ@pep'}
 
