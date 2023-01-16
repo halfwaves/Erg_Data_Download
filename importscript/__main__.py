@@ -21,6 +21,7 @@ class App(tk.Frame):
         self.grid()
         self.createWidgets()
 
+    #Create initial widget
     def createWidgets(self):
         self.quitButton = tk.Button(self, text = 'Don\'t press me',
         command=self.quit)
@@ -39,18 +40,21 @@ class App(tk.Frame):
         self.pw_entry.grid(column=0)
 
         self.rememberVar = tk.BooleanVar(self)
-        self.rememberCB  = tk.Checkbutton(self, text='This does nothing',
+        self.rememberCB  = tk.Checkbutton(self, text='Remember me',
         variable=self.rememberVar, onvalue='yes', offvalue='no')
         self.rememberCB.grid(row = 5, column=1)
 
-        self.rememberPath = tk.BooleanVar(self)
-        self.rememberPathCB  = tk.Checkbutton(self, text='Remember where I stored my login data the last time',
-        variable=self.rememberPath, onvalue='yes', offvalue='no')
+        self.rememberPathB  = tk.Button(self, text='Remember Last Session Parameters',
+        command=rememberLast)
         self.rememberPathCB.grid(row = 6, column=1)
         
         def submit(self=self):
             #Triggers submit event outside of the GUI
             return submitB(self)
+        
+        def rememberLast(self=self):
+            #Triggers submit event outside of GUI that pulls old data
+            return rememberLastB(self)
         
         self.submitButton = tk.Button(self, text = 'Run da program',
         command= submit)
@@ -59,22 +63,30 @@ class App(tk.Frame):
         # self.date = Calendar(master=None)
         # cal = DateEntry(self, variable=self.date,width=30,bg="darkblue",fg="white",year=2010)
         # cal.grid()
+    
+    # Handles when the user asks to use old path that DNE
+    def noCredPath(self):
+        #TODO: finish this
+        print('no credential path exists')
 
-
-        
+'''
+Event handler for when user wants to remember the last session
+'''
+def rememberLastB(self):
+    if not (dh.cred_path()):
+        return noCredPath
+    path = dh.getCred()['csv path']
+    if(path == ''):
+        path = askdirectory(title='Please Select a destination Folder') # shows dialog box and return the path
+        dh.rewriteCredentials(dh.getCred['username'],dh.getCred['password'],csv_path = path)
         
 def submitB(self):
     #Solicit user for input path if not already recorded
     #if user doesn't want credentials to be recorded
     if not (app.rememberPath):
         path = askdirectory(title='Please Select a destination Folder') # shows dialog box and retu
-        
-    elif(dh.getCred()):
-        path = dh.getCred()['csv path']
-        # if path is empty in stored data
-        if(path == ''):
-            path = askdirectory(title='Please Select a destination Folder') # shows dialog box and return the path
-            dh.rewriteCredentials(dh.getCred['username'],dh.getCred['password'],csv_path = path)
+
+       
     #Writes credentials to permanent file
     else:
         path = askdirectory(title='Please Select a destination Folder') # shows dialog box and return the path
@@ -82,8 +94,26 @@ def submitB(self):
             dh.rewriteCredentials (app.un_entry, app.pw_entry,csvpath=path)
     return 
 
+temp_url = 'https://log.concept2.com/profile/1180585/log/71532822'
 
-app = App()                       
-app.master.title('C2 Downloader')
-app.mainloop()
+
+# s = wh.startSession()
+# p = wh.createParser()
+# cred = dh.getCred()
+# r = wh.userLoginC2(s, p, cred)
+# temp = wh.getReq(s, temp_url)
+rParser = wh.createParser()
+with open('example-workout.txt', 'r') as f:
+    x = f.read()
+    rParser.feed(x)
+    p = rParser.pullIntervals()
+    print(p)
+
+
+
+
+
+# app = App()                       
+# app.master.title('C2 Downloader')
+# app.mainloop()
 
