@@ -18,12 +18,6 @@ def openFormatting():
     writer.writeheader()
     return writer
 
-# cred = {
-# 'username': 'newton145', 
-# 'password' : 'bvq8fvp2rza2RYQ@pep', 
-# 'login url' : 'https://log.concept2.com/login',
-# 'home url': 'https://log.concept2.com/log'
-# }
 
 
 def rewriteCredentials(un, pw, login_url = 'https://log.concept2.com/login', home_url = 'https://log.concept2.com/log'):

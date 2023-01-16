@@ -10,8 +10,6 @@ class successful_csv(unittest.TestCase):
     def test_absolute_truth_and_meaning(self):
         self.assertTrue(True)
     
-    def test_create_folder(self):
-        self.assertEquals()
 
 if __name__ == '__main__':
     unittest.main()
