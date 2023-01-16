@@ -48,7 +48,7 @@ class App(tk.Frame):
         self.rememberPathCB.grid(row = 6, column=1)
         
         def submit(self=self):
-            print('does this print?')
+            #Triggers submit event outside of the GUI
             return submitB(self)
         
         self.submitButton = tk.Button(self, text = 'Run da program',
@@ -62,7 +62,13 @@ app.mainloop()
        
         
 def submitB(self):
-    path = askdirectory(title='Please Select a destination Folder') # shows dialog box and return the path
+    if not (app.rememberPath):
+        path = askdirectory(title='Please Select a destination Folder') # shows dialog box and return the path
+    elif(dh.getCred()):
+        path = dh.getCred()['csv path']
+    else:
+        path = askdirectory(title='Please Select a destination Folder') # shows dialog box and return the path
+    
     return [self.unVar, self.pwVar,self.rememberVar, self.rememberPath]
 
 
