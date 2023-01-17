@@ -1,5 +1,7 @@
 from html.parser import HTMLParser
-
+from bs4 import SoupStrainer as strainer
+from bs4 import BeautifulSoup
+import lxml
 class HTMLParseDammit(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
@@ -9,6 +11,16 @@ class HTMLParseDammit(HTMLParser):
         self.startEndTags = list()
         self.comments = list()
         self.data = list()
+        # self.time = list()
+        # self.meters = list()
+        # self.pace = list()
+        # self.watts = list()
+        # self.cals = list()
+        # self.spm = list()
+        # self.heart = list()
+        # self.panel = int
+        # self.intervals = list()
+
    
     def handle_starttag(self, tag, attrs):
       self.startTags.append(tag)
@@ -16,11 +28,10 @@ class HTMLParseDammit(HTMLParser):
       return tag
 
     def handle_endtag(self, tag):
-        self.endTags.extend(tag)
+        self.endTags.append(tag)
         return tag
 
     def handle_data(self, data):
-      # print('not functional')
       self.data.append(data)
 
     def handle_comment(self, data):
@@ -47,4 +58,58 @@ class HTMLParseDammit(HTMLParser):
                 inputs.append(d)
         return inputs
 
+    # def get_peice_data(self):
+    #     intervals = 
 
+
+
+def soupDammit(html):
+    soup = BeautifulSoup(html, 'html.parser')
+    
+    return soup
+
+def getDataLabels(soup):
+    labels = list()
+    for i in range(1, getNumIntervals(soup)+1):
+        for l in lowLabels(soup):
+            labels.append(l + ' ' + str(i))
+    for l in lowLabels(soup):
+        labels.append('AVG'+ ' '+  l)
+    return labels
+
+def lowLabels(soup):
+    labels = list()
+    for child in soup.find('div', {'class':'intervals panel-detail'}).descendants:
+        if child.name == 'table':
+            for el in child.descendants:
+                if el.name == 'th':
+                    labels.append(el.string)
+    labels[-1]= 'HR'
+    return labels
+
+# gets the number of intervals recorded
+def getNumIntervals(soup):
+    s = soup.find_all(name = 'tr', attrs = 'js-interval')
+    return len(s)
+
+def getIntervals(soup):
+    intervalInfo = [{},{},{},{},{},{},{}]
+    labels = lowLabels(soup)
+    papa = soup.find('div', {'class':'intervals panel-detail'})
+    mama = papa.contents[1] 
+    child = mama.find('tr', {'class':'info'})
+    i = 0
+    for bb in child.descendants:
+        if bb.name == 'td':
+            intervalInfo[i]['AVG'+ ' '+ labels[i]] = bb.contents
+            i += 1
+    
+    oopsie = mama.find_all('tr', {'class':'js-interval'})
+    for child in oopsie:
+        i = 0
+        for o in child:
+            if o.name == 'td':
+                intervalInfo[i][labels[i] + ' '+ child['data-interval']] = o.contents
+                i += 1
+    return intervalInfo
+  
