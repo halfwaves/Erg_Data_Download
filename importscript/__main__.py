@@ -102,12 +102,16 @@ temp_url = 'https://log.concept2.com/profile/1180585/log/71532822'
 # cred = dh.getCred()
 # r = wh.userLoginC2(s, p, cred)
 # temp = wh.getReq(s, temp_url)
-rParser = wh.createParser()
+# rParser = wh.createParser()
 with open('example-workout.txt', 'r') as f:
     x = f.read()
-    rParser.feed(x)
-    p = rParser.pullIntervals()
-    print(p)
+    # rParser.feed(x)
+    # p = rParser.pullIntervals()
+    soup = parse.soupDammit(x)
+    labels = parse.getDataLabels(soup)
+    w = dh.createFile('Is it nate', labels)
+    oop = parse.getIntervals(soup)
+    dh.writeRower('NATHANIEL', oop, w)
 
 
 
