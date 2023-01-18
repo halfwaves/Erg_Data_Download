@@ -112,4 +112,18 @@ def getIntervals(soup):
                 intervalInfo[i][labels[i] + ' '+ child['data-interval']] = o.contents
                 i += 1
     return intervalInfo
-  
+
+def getRowers(soup):
+    names = list()
+    urls = list()
+    for child in soup.find_all('div', {'class':'partner__info'}).descendants:
+        if child.name == 'h4':
+            names.append(child.string)
+    
+    for child in soup.find('div', {'class':'partner__actions'}).descendants:
+        if child.name == 'a':
+            for l in child.descendants:
+                if l.strin == 'View Log':
+                    urls.append(l.string)
+    dictionary = dict(zip(names, urls))
+    return dictionary
