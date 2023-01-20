@@ -51,7 +51,11 @@ def getReq(s, url):
 def postReq(s, url):
     return s.post(url)
 
-
+def getTrainingPartners(s, p, url = 'https://log.concept2.com/partners'):
+    r = s.get(url)
+    #Dictionary of all rowers and their urls
+    d = p.getRowers(r) 
+    return d
 
 def loadLoginInfo(un_id, pw_id, cred):
     data = {

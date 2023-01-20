@@ -2,6 +2,7 @@ from html.parser import HTMLParser
 from bs4 import SoupStrainer as strainer
 from bs4 import BeautifulSoup
 import lxml
+from datetime import date as dt
 class HTMLParseDammit(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
@@ -79,12 +80,16 @@ def getDataLabels(soup):
 
 def lowLabels(soup):
     labels = list()
-    for child in soup.find('div', {'class':'intervals panel-detail'}).descendants:
-        if child.name == 'table':
-            for el in child.descendants:
-                if el.name == 'th':
-                    labels.append(el.string)
-    labels[-1]= 'HR'
+    intervals =  soup.find('div', {'class':'intervals panel-detail'})
+    table = intervals.find('table')
+    header = table.find('tr')
+    for title in header.descendants:
+        if title.name == 'th':
+            labels.append(title.string)
+    if labels[-1] == '':
+        labels[-1] = 'HR'
+    else:
+        labels.append('HR')
     return labels
 
 # gets the number of intervals recorded
@@ -95,35 +100,75 @@ def getNumIntervals(soup):
 def getIntervals(soup):
     intervalInfo = [{},{},{},{},{},{},{}]
     labels = lowLabels(soup)
-    papa = soup.find('div', {'class':'intervals panel-detail'})
-    mama = papa.contents[1] 
-    child = mama.find('tr', {'class':'info'})
+    interval_panel = soup.find('div', {'class':'intervals panel-detail'})
+    table = interval_panel.find('table')
+    averages = table.find('tr', {'class':'info'})
     i = 0
-    for bb in child.descendants:
-        if bb.name == 'td':
-            intervalInfo[i]['AVG'+ ' '+ labels[i]] = bb.contents
+
+    for avg in averages.descendants:
+        if avg.name == 'td':
+            data = avg.string
+            if str.__contains__(data, 'm'): #if data is meters
+                 # remove m at the end of the data
+                data = data[:-1]
+            # Write data to dict element
+            intervalInfo[i]['AVG'+ ' '+ labels[i]] = data
             i += 1
     
-    oopsie = mama.find_all('tr', {'class':'js-interval'})
-    for child in oopsie:
-        i = 0
-        for o in child:
-            if o.name == 'td':
-                intervalInfo[i][labels[i] + ' '+ child['data-interval']] = o.contents
+    intervals = table.find_all('tr', {'class':'js-interval'})
+    # Note: there is an unknown number of intervals
+    for interval in intervals:
+        i = 0 # need to preserve numbering in a weird way b/c HR
+        for ele in interval:
+            if ele.name == 'td':
+                data = ele.string
+                if str.__contains__(data, 'm'): #if data is meters
+                    # remove m at the end
+                    data = data[:-1]
+                # Write data to dict element
+                intervalInfo[i][labels[i] + ' '+ interval['data-interval']] = data
                 i += 1
+        # If no HR listed (so there will be no column)
+        if len(interval) < len(labels):
+            # Add null for dict if no heartrate data
+            intervalInfo[i][labels[i] + ' '+ interval['data-interval']] = ''
     return intervalInfo
 
 def getRowers(soup):
     names = list()
     urls = list()
-    for child in soup.find_all('div', {'class':'partner__info'}).descendants:
-        if child.name == 'h4':
-            names.append(child.string)
+    partner_info = soup.find_all('div', {'class':'partner__info'})
+    partner_names = partner_info.find_all('h4')
+    for name in partner_names:
+        names.append(name.string)
     
-    for child in soup.find('div', {'class':'partner__actions'}).descendants:
-        if child.name == 'a':
-            for l in child.descendants:
-                if l.strin == 'View Log':
-                    urls.append(l.string)
+    partner_buttons = soup.find_all('div', {'class':'partner__actions'})
+    button = partner_buttons.find_all('a', string='View Log')
+    for url in button:
+        urls.append(url.string)
     dictionary = dict(zip(names, urls))
     return dictionary
+
+def getLogbookUrls(soup, multiples = 0, date=None):
+    urls = list()
+    # By default, date is today's date
+    if date is None:
+        date = dt.today().strftime('%m/%d/%Y')
+    # Find the URL for today's workout
+    tables = soup.find_all('table', {'id':'log-table'})
+    workouts = tables.find_all('tr')
+    for workout in workouts:
+        if workout.find('td', string=date):
+            icon = workout.find('td', {'class':'text-center'})
+            tag = icon.find('a')
+            urls.append(tag['href'])
+    return urls
+
+def getWorkoutDetails(soup):
+    content = soup.find('section', {'class': 'content'})
+    title = content.find('div', {'class', 'col-sm-12 row'})
+    workout = title.find('small').string
+    return workout
+
+def cullUrls(soup, urls):
+    return None
