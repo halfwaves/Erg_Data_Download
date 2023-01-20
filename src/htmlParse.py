@@ -69,7 +69,7 @@ def soupDammit(html):
     
     return soup
 
-def getDataLabels(soup):
+def getDataLabels(soup, repeats=0):
     labels = list()
     for i in range(1, getNumIntervals(soup)+1):
         for l in lowLabels(soup):
@@ -153,7 +153,7 @@ def getLogbookUrls(soup, multiples = 0, date=None):
     urls = list()
     # By default, date is today's date
     if date is None:
-        date = dt.today().strftime('%m/%d/%Y')
+        date = getDate()
     # Find the URL for today's workout
     tables = soup.find_all('table', {'id':'log-table'})
     workouts = tables.find_all('tr')
@@ -172,3 +172,8 @@ def getWorkoutDetails(soup):
 
 def cullUrls(soup, urls):
     return None
+
+def getDate():
+    # TODO: Figure out if this will be an issue
+    date = dt.today().strftime('%m/%d/%Y')
+    return date

@@ -15,6 +15,7 @@ try:
 except ImportError:
     print('Import Error for GUI')
 
+# MAYBE GET RID OF ALL GUI ELEMENTS 
 class App(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
@@ -126,21 +127,50 @@ if not rowers:
     rowers = wh.getTrainingPartners(s, p)
     # Exclude Rowers
         #TODO
+date = input('Input date of workout you want to read (press t for today\'s ')
+if date == 'T' or 't':
+    date = parse.getDate()
 
 # Pull the first rower on the list with logged data
 labels = parse.lowLabels('example-workout.txt')
-for r in rowers:
-    urls = parse.getLogbookUrls(rowers[r])
-    if urls: #not empty
-        workout_name = list()
-        for t in urls:
-            workout = wh.getReq(s, t)
-            workout_name.append(parse.getWorkoutDetails(workout))
-        # Ask if the workout is [x/x] at date
-        #If yes: get labels from data
+repeats = 0
+try:
+    for r in rowers:
+        urls = parse.getLogbookUrls(rowers[r])
+        if urls: #not empty
+            workout_names = list()
+            for t in urls:
+                workout = wh.getReq(s, t)
+                workout_names.append(parse.getWorkoutDetails(workout))
+            for i,w in enumerate(workout_names):
+                # Ask if the workout is [x/x] at date
+                workout_valid = input('Is this today\' s workout?' + w + 'Y/N')
+                #If yes: get labels from data
+                if workout_valid == 'y' or 'Y':
+                    workout_name = workout
+                    repeats = input('How many repeats of this workout (enter 0 for no repeats)?')
+                    # TODO: Handle repeats of workouts
+                    if repeats < 1:
+                        raise StopIteration
+                    else:
+                        labels = parse.getDataLabels(wh.getReq(urls[i]))
+                        raise StopIteration
+                    
+                elif workout_valid == 'n' or 'N':
+                    break
+                else:
+                    'Invalid Input'
+except StopIteration:
+    print('Getting %(workout)s on %(date)s with %(repeats)d repeats')
+                
+
 
 # #Get the get all rower's workout data
-    
+df = dh.createDataFrame()
+for url in urls:
+    print('todo')
+    #TODO: FINISH ME
+
     # Ask if user wants to include other workouts from that date
     # If yes: repeat for all with the same date (write data to a new table)
 
