@@ -16,7 +16,7 @@ except ImportError:
     print('Import Error for GUI')
 
 # MAYBE GET RID OF ALL GUI ELEMENTS 
-class App(tk.Frame):
+# class App(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.grid()
@@ -135,7 +135,7 @@ if date == 'T' or 't':
 labels = parse.lowLabels('example-workout.txt')
 repeats = 0
 try:
-    for r in rowers:
+    for r in rowers: #Names and logbooks of rowers
         urls = parse.getLogbookUrls(rowers[r])
         if urls: #not empty
             workout_names = list()
@@ -171,12 +171,20 @@ for url in urls:
     print('todo')
     #TODO: FINISH ME
 
-    # Ask if user wants to include other workouts from that date
-    # If yes: repeat for all with the same date (write data to a new table)
-
 # Ask to exclude certain data (time, HR, split, SPM etc.)
+# TODO: Add exclusions
 
-#Get names and URLS for workout from Log: Is this a sub activity 
+#Get names and URLS for workout from Log: 
+try:
+    for r in rowers: #Names and logbooks of rowers
+        urls = parse.getLogbookUrls(rowers[r])
+        if urls: #not empty
+            for t in urls:
+                workout = wh.getReq(s, t)
+            
+                
+except StopIteration:
+    print('Getting %(workout)s on %(date)s with %(repeats)d repeats')
     # Get interval data
     # Write to index (name) in the dataFrame
 

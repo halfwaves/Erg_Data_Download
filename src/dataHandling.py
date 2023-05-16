@@ -68,7 +68,7 @@ def writeFile(filename, df, sheet_name='No Name', startrow=None,
                        truncate_sheet=False, 
                        **to_excel_kwargs):
     # If file doesn't exist
-    if not Path.exists(filename):
+    if not doesFileExist(filename):
          df.to_excel(filename, sheet_name=sheet_name, 
             startrow=startrow if startrow is not None else 0)
     
@@ -76,7 +76,8 @@ def writeFile(filename, df, sheet_name='No Name', startrow=None,
         with pd.ExcelWriter(filename, mode='a', if_sheet_exists='new') as writer:
             df.to_excel(writer, sheet_name=sheet_name, 
                 startrow=startrow if startrow is not None else 0)
-            writer.save()
+    
+    writer.save()
 
 def getRowers(filepath = rower_path):
     try:
@@ -85,5 +86,12 @@ def getRowers(filepath = rower_path):
     except:
         return False
 
-
+def removeData(df, to_remove, repeats):
+    labels = list()
+    for l in to_remove:
+        for i in range(repeats+1):
+            labels.append(l + ' ' + str(i))
+    labels.append('AVG'+ ' '+  l)
+    df.drop(labels, axis = 1)
+    return df
     
